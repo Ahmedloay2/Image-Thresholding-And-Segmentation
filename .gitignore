@@ -1,0 +1,130 @@
+# =========================
+# CMake build directories
+# =========================
+build/
+build-*/
+cmake-build-*/
+out/
+bin/
+lib/
+
+# =========================
+# CMake generated files
+# =========================
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+_deps/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CTestTestfile.cmake
+**/install_manifest.txt
+**/compile_commands.json
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+# =========================
+# Ninja / Make / MSBuild
+# =========================
+*.ninja
+.ninja_deps
+.ninja_log
+*.make
+*.mk
+
+# =========================
+# Compiled objects & binaries
+# =========================
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+
+# =========================
+# Debug / profiling
+# =========================
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.ilk
+*.prof
+*.gcda
+*.gcno
+*.gcov
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# IDEs / Editors
+# =========================
+
+## VS Code
+.vscode/
+.history/
+
+## CLion / JetBrains
+.idea/
+
+## Visual Studio
+.vs/
+*.vcxproj*
+*.sln
+*.user
+*.suo
+*.opensdf
+*.sdf
+
+## Qt Creator
+*.pro.user*
+*.qbs.user*
+*.autosave
+
+## Qt autogen / moc / qrc / ui generated
+ui_*.h
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+
+## Eclipse
+.project
+.cproject
+.settings/
+
+# CMake user-local presets
+CMakeUserPresets.json
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =========================
+# Misc
+# =========================
+*.swp
+*~
+*.tmp
+*.temp
+*.bak
+*.orig
