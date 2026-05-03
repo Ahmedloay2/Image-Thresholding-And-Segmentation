@@ -353,7 +353,7 @@ namespace ThresholdProcessor {
             }
             else
             {
-                t = newT;
+                t = static_cast<uint8_t>(newT);
             }        
         }
 		img.store("optimal_binary", binarize(gray, t));
