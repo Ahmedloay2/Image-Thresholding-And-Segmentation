@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.16)
 project(ImageThresholdingAndSegmentation LANGUAGES CXX)
 
 # ── C++ Standard ────────────────────────────────────────────────
@@ -56,6 +56,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Concurrent
     OpenMP::OpenMP_CXX
 )
+
+# ── Compile Definitions ─────────────────────────────────────────
+target_compile_definitions(${PROJECT_NAME} PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 # ── OpenCV DLL Deployment (Windows) ─────────────────────────────
 if(WIN32)
