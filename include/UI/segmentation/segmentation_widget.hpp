@@ -36,6 +36,8 @@ private slots:
     void onKChanged(int value);
     void onXYWeightChanged(int value);
     void onThresholdChanged(int value);
+    void onMSSpatialChanged(int value);
+    void onMSColorChanged(int value);
     void onClearSeeds();
     void onPixelClicked(int x, int y);
     void onRun();
@@ -61,6 +63,8 @@ private:
     QButtonGroup* algoGroup_ = nullptr;
     QRadioButton* kmRadio_   = nullptr;
     QRadioButton* rgRadio_   = nullptr;
+    QRadioButton* msRadio_   = nullptr;
+    QRadioButton* aggRadio_  = nullptr;
 
     // ── stacked param panels ──────────────────────────────────────────────────
     QStackedWidget* paramStack_ = nullptr;
@@ -78,6 +82,19 @@ private:
     QLabel*      thresholdLabel_  = nullptr;
     QLabel*      seedCountLabel_  = nullptr;
     QPushButton* clearSeedsBtn_   = nullptr;
+
+    // Mean Shift controls
+    QSlider*      msSpatialSlider_ = nullptr;
+    QLabel*       msSpatialLabel_  = nullptr;
+    QSlider*      msColorSlider_   = nullptr;
+    QLabel*       msColorLabel_    = nullptr;
+    QRadioButton* msRgbRadio_      = nullptr;
+    QRadioButton* msLuvRadio_      = nullptr;
+
+    // Agglomerative controls
+    QSpinBox*     aggClustersSpin_ = nullptr;
+    QRadioButton* aggRgbRadio_     = nullptr;
+    QRadioButton* aggLuvRadio_     = nullptr;
 
     // ── run button ────────────────────────────────────────────────────────────
     QPushButton* runBtn_ = nullptr;

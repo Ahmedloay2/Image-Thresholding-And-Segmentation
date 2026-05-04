@@ -45,6 +45,8 @@ private slots:
     void onKMeansChanged(int value);
     void onXYWeightChanged(int value);
     void onThresholdChanged(int value);
+    void onMSSpatialChanged(int value);
+    void onMSColorChanged(int value);
     void onClearSeeds();
     void onImageClicked(int x, int y);
 
@@ -74,6 +76,21 @@ private:
     QButtonGroup*   segAlgoGroup_    = nullptr;
     QRadioButton*   kmRadio_         = nullptr;
     QRadioButton*   rgRadio_         = nullptr;
+    QRadioButton*   msRadio_         = nullptr;
+    QRadioButton*   aggRadio_        = nullptr;
+
+    // Mean Shift widgets
+    QSlider*        msSpatialSlider_ = nullptr;
+    QLabel*         msSpatialLabel_  = nullptr;
+    QSlider*        msColorSlider_   = nullptr;
+    QLabel*         msColorLabel_    = nullptr;
+    QRadioButton*   msRgbRadio_      = nullptr;
+    QRadioButton*   msLuvRadio_      = nullptr;
+
+    // Agglomerative widgets
+    QSpinBox*       aggClustersSpin_ = nullptr;
+    QRadioButton*   aggRgbRadio_     = nullptr;
+    QRadioButton*   aggLuvRadio_     = nullptr;
 
     // Controllers
     ThresholdController    threshCtrl_;

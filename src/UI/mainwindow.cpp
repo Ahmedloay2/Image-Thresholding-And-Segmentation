@@ -66,18 +66,24 @@ void MainWindow::buildSegmentationPanel()
     root->setSpacing(8);
 
     // Algorithm selector
-    kmRadio_ = new QRadioButton("k-Means");
-    rgRadio_ = new QRadioButton("Region Growing");
+    kmRadio_  = new QRadioButton("k-Means");
+    rgRadio_  = new QRadioButton("Region Growing");
+    msRadio_  = new QRadioButton("Mean Shift");
+    aggRadio_ = new QRadioButton("Agglomerative");
     kmRadio_->setChecked(true);
 
     segAlgoGroup_ = new QButtonGroup(this);
     segAlgoGroup_->addButton(kmRadio_, 0);
     segAlgoGroup_->addButton(rgRadio_, 1);
+    segAlgoGroup_->addButton(msRadio_, 2);
+    segAlgoGroup_->addButton(aggRadio_, 3);
 
     auto* algoBox    = new QGroupBox("Algorithm");
     auto* algoLayout = new QHBoxLayout;
     algoLayout->addWidget(kmRadio_);
     algoLayout->addWidget(rgRadio_);
+    algoLayout->addWidget(msRadio_);
+    algoLayout->addWidget(aggRadio_);
     algoLayout->addStretch();
     algoBox->setLayout(algoLayout);
     root->addWidget(algoBox);
@@ -85,7 +91,7 @@ void MainWindow::buildSegmentationPanel()
     // Stacked param panels
     segParamStack_ = new QStackedWidget;
 
-    // k-Means panel
+    // 0: k-Means panel
     auto* kmPanel  = new QWidget;
     auto* kmLayout = new QVBoxLayout(kmPanel);
     kmLayout->setContentsMargins(0, 0, 0, 0);
@@ -125,7 +131,7 @@ void MainWindow::buildSegmentationPanel()
     kmLayout->addWidget(spaceBox);
     kmLayout->addWidget(xyWeightRow_);
 
-    // Region Growing panel
+    // 1: Region Growing panel
     auto* rgPanel  = new QWidget;
     auto* rgLayout = new QVBoxLayout(rgPanel);
     rgLayout->setContentsMargins(0, 0, 0, 0);
@@ -154,15 +160,82 @@ void MainWindow::buildSegmentationPanel()
     rgLayout->addLayout(seedRow);
     rgLayout->addWidget(hint);
 
-    segParamStack_->addWidget(kmPanel); // 0
-    segParamStack_->addWidget(rgPanel); // 1
+    // 2: Mean Shift panel
+    auto* msPanel  = new QWidget;
+    auto* msLayout = new QVBoxLayout(msPanel);
+    msLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto* msSpRow = new QHBoxLayout;
+    msSpatialSlider_ = new QSlider(Qt::Horizontal);
+    msSpatialSlider_->setRange(1, 100);
+    msSpatialSlider_->setValue(15);
+    msSpatialLabel_ = new QLabel("15");
+    msSpatialLabel_->setMinimumWidth(30);
+    msSpRow->addWidget(new QLabel("Spatial BW:"));
+    msSpRow->addWidget(msSpatialSlider_);
+    msSpRow->addWidget(msSpatialLabel_);
+
+    auto* msColRow = new QHBoxLayout;
+    msColorSlider_ = new QSlider(Qt::Horizontal);
+    msColorSlider_->setRange(1, 100);
+    msColorSlider_->setValue(20);
+    msColorLabel_ = new QLabel("20");
+    msColorLabel_->setMinimumWidth(30);
+    msColRow->addWidget(new QLabel("Color BW:"));
+    msColRow->addWidget(msColorSlider_);
+    msColRow->addWidget(msColorLabel_);
+
+    auto* msFrameBox = new QGroupBox("Color Frame");
+    auto* msFrameLayout = new QHBoxLayout;
+    msRgbRadio_ = new QRadioButton("RGB");
+    msLuvRadio_ = new QRadioButton("LUV");
+    msRgbRadio_->setChecked(true);
+    msFrameLayout->addWidget(msRgbRadio_);
+    msFrameLayout->addWidget(msLuvRadio_);
+    msFrameLayout->addStretch();
+    msFrameBox->setLayout(msFrameLayout);
+
+    msLayout->addLayout(msSpRow);
+    msLayout->addLayout(msColRow);
+    msLayout->addWidget(msFrameBox);
+
+    // 3: Agglomerative panel
+    auto* aggPanel  = new QWidget;
+    auto* aggLayout = new QVBoxLayout(aggPanel);
+    aggLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto* aggKRow = new QHBoxLayout;
+    aggClustersSpin_ = new QSpinBox;
+    aggClustersSpin_->setRange(1, 32);
+    aggClustersSpin_->setValue(5);
+    aggKRow->addWidget(new QLabel("k (clusters):"));
+    aggKRow->addWidget(aggClustersSpin_);
+    aggKRow->addStretch();
+
+    auto* aggFrameBox = new QGroupBox("Color Frame");
+    auto* aggFrameLayout = new QHBoxLayout;
+    aggRgbRadio_ = new QRadioButton("RGB");
+    aggLuvRadio_ = new QRadioButton("LUV");
+    aggRgbRadio_->setChecked(true);
+    aggFrameLayout->addWidget(aggRgbRadio_);
+    aggFrameLayout->addWidget(aggLuvRadio_);
+    aggFrameLayout->addStretch();
+    aggFrameBox->setLayout(aggFrameLayout);
+
+    aggLayout->addLayout(aggKRow);
+    aggLayout->addWidget(aggFrameBox);
+
+    segParamStack_->addWidget(kmPanel);  // 0
+    segParamStack_->addWidget(rgPanel);  // 1
+    segParamStack_->addWidget(msPanel);  // 2
+    segParamStack_->addWidget(aggPanel); // 3
     root->addWidget(segParamStack_);
     root->addStretch();
 
     // Connections
     connect(segAlgoGroup_, &QButtonGroup::idClicked, this, [this](int id) {
         segParamStack_->setCurrentIndex(id);
-        if (id == 0) {
+        if (id != 1) { // Clear seeds if not in Region Growing
             segCtrl_.clearSeeds();
             seedPoints_.clear();
             updateSeedLabel();
@@ -175,6 +248,8 @@ void MainWindow::buildSegmentationPanel()
             this, &MainWindow::onKMeansChanged);
     connect(xyWeightSlider_,  &QSlider::valueChanged, this, &MainWindow::onXYWeightChanged);
     connect(thresholdSlider_, &QSlider::valueChanged, this, &MainWindow::onThresholdChanged);
+    connect(msSpatialSlider_, &QSlider::valueChanged, this, &MainWindow::onMSSpatialChanged);
+    connect(msColorSlider_,   &QSlider::valueChanged, this, &MainWindow::onMSColorChanged);
     connect(clearSeedsBtn_,   &QPushButton::clicked,  this, &MainWindow::onClearSeeds);
     connect(rgbXyRadio_, &QRadioButton::toggled, xyWeightRow_, &QWidget::setVisible);
 }
@@ -253,8 +328,20 @@ void MainWindow::onRunClicked()
         runSegmentation();
 }
 
-void MainWindow::onTabChanged(int /*index*/)
+void MainWindow::onTabChanged(int index)
 {
+    // Hide threshold-specific "Method" selection and vertical separator when in segmentation
+    ui_->lblMethodTitle->setVisible(index == 0);
+    ui_->cmbMethod->setVisible(index == 0);
+    ui_->separator1->setVisible(index == 0);
+
+    // Also hide threshold params so they don't leak into segmentation
+    if (index == 1) {
+        updateParamsVisibility(-1); // Hides all threshold params
+    } else {
+        updateParamsVisibility(ui_->cmbMethod->currentIndex());
+    }
+
     if (!basePixmap_.isNull())
         displayPixmap(ui_->lblOriginalImage, basePixmap_);
     ui_->lblResultImage->clear();
@@ -279,6 +366,8 @@ void MainWindow::onKSpectralChanged(int value)   { ui_->lblKVal->setText(QString
 void MainWindow::onKMeansChanged(int /*v*/)      {}
 void MainWindow::onXYWeightChanged(int value)    { xyWeightLabel_->setText(QString::number(value)); }
 void MainWindow::onThresholdChanged(int value)   { thresholdLabel_->setText(QString::number(value)); }
+void MainWindow::onMSSpatialChanged(int value)   { msSpatialLabel_->setText(QString::number(value)); }
+void MainWindow::onMSColorChanged(int value)     { msColorLabel_->setText(QString::number(value)); }
 
 void MainWindow::onClearSeeds()
 {
@@ -324,20 +413,31 @@ void MainWindow::runSegmentation()
 {
     QPixmap result;
 
-    if (segAlgoGroup_->checkedId() == 0) {
+    int algoId = segAlgoGroup_->checkedId();
+
+    if (algoId == 0) { // k-Means
         const KMeansProcessor::Space space = rgbXyRadio_->isChecked()
             ? KMeansProcessor::Space::RGB_XY
             : KMeansProcessor::Space::RGB;
         result = segCtrl_.runKMeans(kSpin_->value(), space,
                                     static_cast<float>(xyWeightSlider_->value()));
-    } else {
+    }
+    else if (algoId == 1) { // Region Growing
         if (segCtrl_.seedCount() == 0) {
             QMessageBox::information(this, "No Seeds",
                 "Click on the original image to plant at least one seed.");
             return;
         }
-        result = segCtrl_.runRegionGrowing(
-            static_cast<float>(thresholdSlider_->value()));
+        result = segCtrl_.runRegionGrowing(static_cast<float>(thresholdSlider_->value()));
+    }
+    else if (algoId == 2) { // Mean Shift
+        result = segCtrl_.runMeanShift(msSpatialSlider_->value(),
+                                       msColorSlider_->value(),
+                                       msLuvRadio_->isChecked());
+    }
+    else if (algoId == 3) { // Agglomerative
+        result = segCtrl_.runAgglomerative(aggClustersSpin_->value(),
+                                           aggLuvRadio_->isChecked());
     }
 
     if (result.isNull()) {

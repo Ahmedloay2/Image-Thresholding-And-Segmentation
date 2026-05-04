@@ -12,6 +12,8 @@
 #include "model/image.hpp"
 #include "processors/kmeans_processor.hpp"
 #include "processors/region_growing_processor.hpp"
+#include "processors/segmentation_processor.hpp"
+#include "processors/agglomerative_processor.hpp"
 
 #include <opencv2/core.hpp>
 #include <vector>
@@ -53,6 +55,16 @@ public:
 
     /// Run Region Growing using planted seeds. Returns result pixmap or null.
     QPixmap runRegionGrowing(float threshold);
+
+    // ── Mean Shift ────────────────────────────────────────────────────────────
+
+    /// Run Mean Shift segmentation.
+    QPixmap runMeanShift(int spatialBandwidth, int colorBandwidth, bool useLUV);
+
+    // ── Agglomerative ─────────────────────────────────────────────────────────
+
+    /// Run Agglomerative clustering segmentation.
+    QPixmap runAgglomerative(int targetClusters, bool useLUV);
 
     // ── Shared ────────────────────────────────────────────────────────────────
 

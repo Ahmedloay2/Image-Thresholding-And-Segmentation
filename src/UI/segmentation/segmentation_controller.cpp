@@ -54,6 +54,24 @@ QPixmap SegmentationController::runRegionGrowing(float threshold)
     return matToPixmap(image_.get("region_growing_scratch"));
 }
 
+// ── Mean Shift ────────────────────────────────────────────────────────────
+
+QPixmap SegmentationController::runMeanShift(int spatialBandwidth, int colorBandwidth, bool useLUV)
+{
+    if (!hasImage()) return {};
+    SegmentationProcessor::meanShiftScratch(image_, spatialBandwidth, colorBandwidth, useLUV);
+    return matToPixmap(image_.get("mean_shift_scratch"));
+}
+
+// ── Agglomerative ─────────────────────────────────────────────────────────
+
+QPixmap SegmentationController::runAgglomerative(int targetClusters, bool useLUV)
+{
+    if (!hasImage()) return {};
+    AgglomerativeProcessor::agglomerativeScratch(image_, targetClusters, useLUV);
+    return matToPixmap(image_.get("agglomerative_scratch"));
+}
+
 // ── Shared ────────────────────────────────────────────────────────────────────
 
 QPixmap SegmentationController::matToPixmap(const cv::Mat& mat)

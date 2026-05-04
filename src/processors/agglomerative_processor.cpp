@@ -70,8 +70,6 @@ namespace AgglomerativeProcessor {
             }
         }
         
-        std::ofstream linkage_file("linkage.csv");
-        
         int current_clusters = N;
         int next_cluster_id = N;
         
@@ -155,15 +153,12 @@ namespace AgglomerativeProcessor {
             }
             update_min_idx(new_cluster);
             
-            linkage_file << best_i << "," << best_j << "," << min_d << "," << features[new_cluster].size << "\n";
-            
             current_clusters--;
             
             if (current_clusters == targetClusters) {
                 for (int i = 0; i < N; ++i) {
                     final_labels[i] = find_root(i, find_root);
                 }
-                // Do not break early! Scipy dendrogram requires the full N-1 merges to build the complete tree.
             }
         }
         
@@ -172,7 +167,6 @@ namespace AgglomerativeProcessor {
                 final_labels[i] = find_root(i, find_root);
             }
         }
-        linkage_file.close();
         
         std::vector<int> unique_labels;
         for (int i = 0; i < N; ++i) {
