@@ -32,6 +32,12 @@ file(GLOB_RECURSE HEADER_FILES
     "${PROJECT_INCLUDE_DIR}/*.h"
 )
 
+set_source_files_properties(
+    "${PROJECT_INCLUDE_DIR}/UI/segmentation/segmentation_widget.hpp"
+    "${PROJECT_INCLUDE_DIR}/UI/segmentation/segmentation_controller.hpp"
+    PROPERTIES SKIP_AUTOMOC OFF
+)
+
 file(GLOB_RECURSE UI_FILES
     "${PROJECT_UI_DIR}/*.ui"
 )
@@ -41,6 +47,8 @@ add_executable(${PROJECT_NAME}
     ${SRC_FILES}
     ${HEADER_FILES}
     ${UI_FILES}
+    "${PROJECT_INCLUDE_DIR}/UI/segmentation/segmentation_widget.hpp"
+    "${PROJECT_INCLUDE_DIR}/UI/segmentation/segmentation_controller.hpp"
 )
 
 # ── Include Directories ─────────────────────────────────────────

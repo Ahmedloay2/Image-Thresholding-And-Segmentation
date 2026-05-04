@@ -1,17 +1,19 @@
 #pragma once
 
-/**
- * @file mainwindow.hpp
- * @brief Main application window.
- *
- * SRP: MainWindow only handles UI events and display.
- *      All processing is delegated to ThresholdController.
- *      MainWindow never calls ThresholdProcessor directly.
- */
-
 #include <QMainWindow>
-#include "UI/threshold/threshold_controller.hpp"
 #include <QLabel>
+#include <QSpinBox>
+#include <QSlider>
+#include <QRadioButton>
+#include <QPushButton>
+#include <QStackedWidget>
+#include <QButtonGroup>
+#include <QMouseEvent>
+#include <QEvent>
+#include <vector>
+
+#include "UI/threshold/threshold_controller.hpp"
+#include "UI/segmentation/segmentation_controller.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,35 +27,63 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
 private slots:
-    // ── Toolbar ──────────────────────────────────────────────────────────────
     void onLoadImage();
     void onRunClicked();
+    void onTabChanged(int index);
 
-    // ── Method selector ───────────────────────────────────────────────────────
+    // Threshold slots
     void onMethodChanged(int index);
-
-    // ── Sliders ───────────────────────────────────────────────────────────────
     void onWindowSizeChanged(int value);
     void onCChanged(int value);
-    void onKChanged(int value);
+    void onKSpectralChanged(int value);
+
+    // Segmentation slots
+    void onKMeansChanged(int value);
+    void onXYWeightChanged(int value);
+    void onThresholdChanged(int value);
+    void onClearSeeds();
+    void onImageClicked(int x, int y);
 
 private:
-    Ui::MainWindow* ui_;
-    ThresholdController controller_;
-
-    // ── UI helpers ────────────────────────────────────────────────────────────
-
-    /// Display a pixmap scaled to fit a QLabel while keeping aspect ratio.
-    static void displayPixmap(QLabel* label, const QPixmap& pixmap);
-
-    /// Show/hide the params panel and the correct slider rows for the current method.
+    void buildSegmentationPanel();
     void updateParamsVisibility(int methodIndex);
+    void runThreshold();
+    void runSegmentation();
+    void displayPixmap(QLabel* label, const QPixmap& pixmap);
+    void updateSeedLabel();
+    void drawSeedOverlay();
 
-    /// Re-run the currently selected method and update the result label.
-    void runCurrentMethod();
+    Ui::MainWindow* ui_;
 
-    // ── Method index constants ─────────────────────────────────────────────────
+    // Segmentation param widgets (built in code, injected into tabSegmentation)
+    QStackedWidget* segParamStack_   = nullptr;
+    QSpinBox*       kSpin_           = nullptr;
+    QRadioButton*   rgbRadio_        = nullptr;
+    QRadioButton*   rgbXyRadio_      = nullptr;
+    QSlider*        xyWeightSlider_  = nullptr;
+    QLabel*         xyWeightLabel_   = nullptr;
+    QWidget*        xyWeightRow_     = nullptr;
+    QSlider*        thresholdSlider_ = nullptr;
+    QLabel*         thresholdLabel_  = nullptr;
+    QLabel*         seedCountLabel_  = nullptr;
+    QPushButton*    clearSeedsBtn_   = nullptr;
+    QButtonGroup*   segAlgoGroup_    = nullptr;
+    QRadioButton*   kmRadio_         = nullptr;
+    QRadioButton*   rgRadio_         = nullptr;
+
+    // Controllers
+    ThresholdController    threshCtrl_;
+    SegmentationController segCtrl_;
+
+    // State
+    QPixmap             basePixmap_;
+    std::vector<QPoint> seedPoints_;
+    bool                imageLoaded_ = false;
+
     static constexpr int METHOD_OPTIMAL         = 0;
     static constexpr int METHOD_OTSU            = 1;
     static constexpr int METHOD_SPECTRAL_AUTO   = 2;
