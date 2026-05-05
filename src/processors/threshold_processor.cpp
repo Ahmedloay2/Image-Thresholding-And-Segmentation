@@ -122,7 +122,7 @@ namespace {
     */
     std::vector<int> findPeaks(const std::vector<int>& smoothed) {
         std::vector<int> peaks;
-        for (int i = 1; i < smoothed.size() - 1; i++)
+        for (int i = 1; i < (int)smoothed.size() - 1; i++)
         {
             if (smoothed[i] > smoothed[i - 1] && smoothed[i] > smoothed[i + 1])
             {
@@ -207,7 +207,13 @@ namespace {
 
         std::vector<int> valleys = findValleys(smoothed, peaks);
 
+        if (valleys.empty()) {
+            // Fallback: treat whole image as one class → black
+            img.store("spectral_manual_labeled", cv::Mat::zeros(gray.rows, gray.cols, CV_8UC1));
+            return;
+        }
         int numClasses = (int)valleys.size() + 1;
+
         cv::Mat spectralMat(gray.rows, gray.cols, CV_8UC1);
 
         for (int i = 0; i < gray.rows; i++)
@@ -256,8 +262,10 @@ namespace {
         std::vector<int> peaks = findPeaks(smoothed);
 
 
-        if (peaks.size() < 2)
+        if (peaks.size() < 3)
         {
+            // Not enough modes for spectral thresholding (requires 3+)
+            // Fallback to mean-based binarization
             cv::Scalar meanVal = cv::mean(gray);
             img.store("spectral_auto_labeled",
                 binarize(gray, static_cast<uint8_t>(meanVal[0])));
@@ -266,6 +274,11 @@ namespace {
 
         std::vector<int> valleys = findValleys(smoothed, peaks);
 
+        if (valleys.empty()) {
+            cv::Scalar meanVal = cv::mean(gray);
+            img.store("spectral_auto_labeled", binarize(gray, static_cast<uint8_t>(meanVal[0])));
+            return;
+        }
         int numClasses = (int)valleys.size() + 1;
         cv::Mat spectralMat(gray.rows, gray.cols, CV_8UC1);
 
@@ -391,7 +404,7 @@ namespace ThresholdProcessor {
         {
             normalizedHistogram[i] = static_cast<double>(histogram[i]) / (gray.rows * gray.cols);
         }
-        std::array<double, 256> classVariance;
+        std::array<double, 256> classVariance{};
 		for (int t = 0; t < 256; t++)
         {
             double backgroundWeight = 0;
