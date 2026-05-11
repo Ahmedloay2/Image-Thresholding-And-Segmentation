@@ -98,6 +98,16 @@ The project follows a layered MVC architecture with SOLID principles applied thr
 - Optional **LUV colour space**.
 - Output stored as `"agglomerative_scratch"`.
 
+### Thresholding (`ThresholdProcessor`)
+
+- **Optimal Thresholding:** Iterative algorithm that alternates between splitting the histogram at the current threshold and recomputing the threshold as the mean of the two resulting group means. Converges when the threshold stops changing. Operates on the grayscale image.
+
+- **Otsu's Method:** Exhaustively searches all possible thresholds (0–255) and selects the one that maximises the *between-class variance* of the foreground and background pixel distributions. Produces a single global binary result.
+
+- **Spectral Thresholding:** Analyses the histogram to locate *K* dominant peaks and places thresholds in the valleys between them, yielding a multi-level (non-binary) label map. In **auto** mode *K* is estimated from the histogram; in **manual** mode the caller supplies *K* directly. Results stored as `"spectral_auto_labeled"` and `"spectral_manual_labeled"`.
+
+- **Local (Adaptive) Thresholding:** Divides the image into overlapping windows of configurable size and computes a per-window threshold as the local mean minus an offset *C*. This handles uneven illumination that would defeat a single global threshold. Window size must be odd; the controller enforces this automatically. Output stored as `"local_binary"`.
+
 ---
 
 ## Dependencies
@@ -165,5 +175,3 @@ For Region Growing, seeds can be cleared and re-placed at any time without reloa
 │   └── image_handler.cpp           # loadImage() wrapping cv::imread
 └── mainwindow.cpp
 ```
-
----
